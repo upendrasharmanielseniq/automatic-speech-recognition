@@ -1,0 +1,27 @@
+# Ignore environment config
+genai-backend/ .env
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
+
+# Virtual environments
+venv/
+env/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python packages
+*.egg-info/
+
+# Node
+node_modules/
+package-lock.json
