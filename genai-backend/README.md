@@ -38,7 +38,7 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
 ### 1. Clone this Repo
 ### 2. Setup Environment
 ```
-cd backend
+cd genai-backend
 python -m venv venv
 venv\Scripts\activate # Windows
 source venv/bin/activate # macOS/Linux
@@ -46,7 +46,7 @@ source venv/bin/activate # macOS/Linux
 pip install -r requirements.txt
 ```
 
-### 3. Add .env in backend/
+### 3. Add .env in genai-backend/
 ```
 OPENAI_API_KEY=
 TMDB_API_KEY= (optional)
@@ -67,7 +67,7 @@ curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -
 
 From File:
 ```
-python backend/run_from_txt.py
+python genai-backend/run_from_txt.py
 ```
 
 ## Roadmap

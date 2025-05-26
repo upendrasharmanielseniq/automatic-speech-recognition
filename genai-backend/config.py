@@ -2,9 +2,5 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY")
-# AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
-# AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-# TMBD_API_KEY = os.getenv("TMDB_API_KEY")
-OPEN_API_KEY = os.getenv("OPENAI_API_KEY")
+os.environ["OPENAI_API_KEY"] = "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"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

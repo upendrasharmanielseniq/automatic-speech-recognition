@@ -1,5 +1,5 @@
 import requests
-from backend.config import TMDB_API_KEY
+from config import TMDB_API_KEY
 
 def enrich_with_metadata(title):
     url = f"https://api.themoviedb.org/3/search/multi?api_key={TMDB_API_KEY}&query={title}"

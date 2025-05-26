@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Request
-from backend.schemas import TranscriptRequest
-from backend.inference import predict_content
+from fastapi import FastAPI
+from schemas import TranscriptRequest
+from inference import predict_content
 # from backend.tmdb_api import enrich_with_metadata
 
 app = FastAPI()
