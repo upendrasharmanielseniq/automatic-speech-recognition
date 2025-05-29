@@ -1,14 +1,14 @@
 # Speech-to-Text GenAI Classifier
-This project is a production-grade backend for identifying TV Shows, Movies, or Episodes from speech transcript text using OpenAI's GPT model. It is designed to work with a C++ speech-to-text system (e.g. Whisper) on embedded devices and can receive transcript text for classification.
+This project is a production-grade backend for identifying TV Shows, Movies, or Episodes from speech transcript text using Azure OpenAI's GPT-4o-mini model. It is designed to work alongside embedded C++ speech-to-text systems (e.g., Whisper.cpp or Vosk) and provides a clean API for transcript-based content classification.
 
 ---
 
 ## Features
-- Real-time or batch transcript ingestion (JSON or `.txt`)
-- GenAI-powdered classification (GPT-4 / GPT-3.5)
-- Returns title, season, episode, and language
-- Designed to work with embedded C++ STT modules
-- Easily extendable with TMDb metadata and frontend UI
+🔊 Real-time or batch transcript ingestion (JSON or `.txt`)
+🧠 GenAI-powered classification (Azure OpenAI GPT-4o-mini)
+🎬 Returns title, season, episode, and language
+⚙️ Designed to work with embedded C++ STT modules
+🧩 Easily extendable with TMDb metadata and frontend UI
 
 ---
 
@@ -35,24 +35,37 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
 ```
 
 ## Setup
-### 1. Clone this Repo
+### 1. Clone this Repository
+```
+git clone https://github.com/your-org/genai-backend.git
+cd genai-backend
+```
 ### 2. Setup Environment
 ```
-cd genai-backend
 python -m venv venv
 venv\Scripts\activate # Windows
 source venv/bin/activate # macOS/Linux
 
+```
+### 3. Install Dependencies
+```
 pip install -r requirements.txt
 ```
 
-### 3. Add .env in genai-backend/
+### 4. Configure Environment Variables
+Create a .env file in the root directory:
 ```
-OPENAI_API_KEY=
+AZURE_OPENAI_KEY=your_azure_openai_key
+AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 TMDB_API_KEY= (optional)
 ```
 
 ## Running the backend
+```
+uvicorn main:app --reload
+```
+Or with explicit PYTHONPATH:
 ```
 $env:PYTHONPATH = "."; uvicorn backend.main:app --reload # Powershell
 # OR
@@ -74,7 +87,7 @@ python genai-backend/run_from_txt.py
 - Add sliding window evaluation and scoring
 - Integrate TMDb metadata and poster fetching
 - Build Shazam-style React UI
-- Deploy via Docker / Azure 
+- Deploy via Docker / Azure App Service
 
 ## License
 MIT License

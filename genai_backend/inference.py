@@ -1,28 +1,22 @@
-from openai import OpenAI
-# from backend.config import AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT
-from config import OPENAI_API_KEY
-client = OpenAI(api_key=OPENAI_API_KEY)
-# openai.api_type = "azure"
-# openai.api_version = "2023-07-01-preview"
-# openai.api_base = AZURE_OPENAI_ENDPOINT
-# openai.api_key = AZURE_OPENAI_KEY
 
+from openai import AzureOpenAI
+from schemas import TranscriptRequest
+from config import (
+    AZURE_OPENAI_KEY,
+    AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_DEPLOYMENT,
+    AZURE_OPENAI_API_VERSION
+    )
 
-response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "user", "content": "Hello, can you confirm the connection is working?"}
-    ]
+client = AzureOpenAI(
+    api_key=AZURE_OPENAI_KEY,
+    api_version=AZURE_OPENAI_API_VERSION,
+    azure_endpoint=AZURE_OPENAI_ENDPOINT
 )
-print(response.choices[0].message.content)
-
 
 
 def build_prompt(chunks):
     full_text = " ".join([c.transcript for c in chunks])
-    """
-    Build the prompt for the OpenAI model.
-    """
     return f"""
     You are a movie and shows expert. Given a transcript of a movie or show, predict the content of the movie from transcript text.
     The transcript is: {full_text}
@@ -41,23 +35,30 @@ def predict_content(transcript):
     prompt = build_prompt(transcript.chunks)
     try:
         response = client.chat.completions.create(
-            # engine=AZURE_OPENAI_DEPLOYMENT,
-            model="gpt-3.5-turbo",  # the problem could be the key, the model, or the network
+            model=AZURE_OPENAI_DEPLOYMENT,
             messages=[
                 {"role": "system", "content": "You are a streaming content classifier."},
                 {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            # max_tokens=1000,
-            # top_p=1,
-            # frequency_penalty=0,
-            # presence_penalty=0
-        )
-        return parse_response(response['choices'][0]['message']['content'])    
+                ],
+                temperature=0.3,
+                max_tokens=500
+                )
+        return parse_response(response.choices[0].message.content)
     except Exception as e:
         print("OpenAI API call failed:", e)
         return {"error": "Prediction failed", "details": str(e)}
 
+def sliding_window_prediction(chunks,window_size=5, step_size=1):
+    for i in range(0, len(chunks) - - window_size + 1, step_size):
+        window = chunks[i:i + window_size]
+        transcript_request = TranscriptRequest(chunks=window)
+        prediction = predict_content(transcript_request)
+        
+        # Optional: If prediction is confident, break early
+        if prediction.get("title") and prediction["title"].lower() != "unknown":
+            return prediction
+    
+    return {"error": "No confident prediction in any window"}
     
 def parse_response(text):
     lines = text.strip().split("\n")

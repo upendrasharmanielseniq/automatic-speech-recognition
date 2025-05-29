@@ -1,0 +1,16 @@
+Why Parse JSON on the GenAI End?
+LLM-Friendly Structure:
+The input (TranscriptRequest) and output (prediction JSON) are structured specifically for LLM-based classification (like Azure OpenAI or local LLMs). It makes sense to handle data shaping here.
+
+FastAPI’s Native Support:
+Python + FastAPI has built-in support for reading and responding with JSON. This makes parsing, validating, and manipulating JSON very easy with pydantic models like TranscriptChunk.
+
+Keep C++ Lean:
+Let the C++ backend focus on lower-level tasks like triggering a scan, handling performance-critical code, or streaming. Offload high-level parsing/logic to the Python side where it's easier and faster to iterate.
+
+Decouple Logic:
+Keeping parsing in GenAI allows you to:
+
+Reuse the endpoint with any client (not just C++).
+
+Easily debug/test using Postman, curl, or browser.
