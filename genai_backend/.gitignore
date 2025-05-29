@@ -1,5 +1,5 @@
 # Ignore environment config
-genai-backend/ .env
+genai_backend/ .env
 
 # Python cache files
 __pycache__/
