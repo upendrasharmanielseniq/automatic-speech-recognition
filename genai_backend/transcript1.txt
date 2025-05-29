@@ -1,0 +1,112 @@
+{
+  "chunks": [
+    {
+      "min": 0,
+      "transcript": "Hi, happy birthday! Happy birthday! Hey. She's not as pretty as she was when she was 29. Miss Green would like to establish some ground rules before she comes out. She would appreciate it if you didn't use the words old or downhill or they still look pretty damn good. They do!"
+    },
+    {
+      "min": 1,
+      "transcript": "Rachel, come on out! Monica made breakfast. Chocolate chip pancakes. We've got presents!"
+    },
+    {
+      "min": 2,
+      "transcript": "Good ones? They all came from the list you handed out to us two weeks ago. Well, can I keep the presents and still be 29? Come on, Rach. Look, turning 30's not that big a deal."
+    },
+    {
+      "min": 3,
+      "transcript": "Oh, really? Is that how you felt when you turned 30? Why, God, why? We had a deal. Let the others grow old, not me!"
+    },
+    {
+      "min": 4,
+      "transcript": "Oh, come on, you guys. Is it just me? Am I overreacting to this? No, Rach, it's not just you. My 30th birthday certainly wasn't that much fun."
+    },
+    {
+      "min": 5,
+      "transcript": "And now Chandler. We're all getting so old. Why are you doing this to us?"
+    },
+    {
+      "min": 6,
+      "transcript": "So no one told you life was gonna be this way:"
+    },
+    {
+      "min": 7,
+      "transcript": "1. Your job's a joke,"
+    },
+    {
+      "min": 8,
+      "transcript": "2. you're broke,"
+    },
+    {
+      "min": 9,
+      "transcript": "3. your love life's DOA."
+    },
+    {
+      "min": 10,
+      "transcript": "It's like you're always stuck in second gear. When it hasn't been your day, your week, your month, or even your year."
+    },
+    {
+      "min": 11,
+      "transcript": "I'll be there for you. I'll be there for you."
+    },
+    {
+      "min": 12,
+      "transcript": "Rachel, you're in a great place in your life. Come on, you have an amazing job, good friends."
+    },
+    {
+      "min": 13,
+      "transcript": "Yeah, the roommate's a soap opera star. Your character's in a coma. I promised myself I wasn't gonna cry at this one."
+    },
+    {
+      "min": 14,
+      "transcript": "Look, you know, I know my life's going pretty well, but I look around and I just see so many people who've accomplished so many of their goals by the time they're 30."
+    },
+    {
+      "min": 15,
+      "transcript": "Yeah, but you shouldn't compare yourself to me. Come on, let's do a baby. Come on. There you go! You did it! One mile on a hippity hop."
+    },
+    {
+      "min": 16,
+      "transcript": "That's it? That's everything I wanted to do before I was 30. Except I wanted to patch things up with my sister. But yay!"
+    },
+    {
+      "min": 17,
+      "transcript": "And girls, this thing is a godsend, if you know what I mean. Come on, let's have some fun. What do you want to do today?"
+    },
+    {
+      "min": 18,
+      "transcript": "Nothing. I don't want to do anything. Doing nothing on your 30th is better than doing something stupid, like Ross."
+    },
+    {
+      "min": 19,
+      "transcript": "That was a practical purchase. I needed that car for transportation. Okay, I have a child. How do I look in this, huh?"
+    },
+    {
+      "min": 20,
+      "transcript": "Ross, a sports car? Wouldn't it have been cheaper to just stuff a sock down there?"
+    },
+    {
+      "min": 21,
+      "transcript": "That's not what this is about, okay? I am a sports car enthusiast. I've always been into cars."
+    },
+    {
+      "min": 22,
+      "transcript": "Hey, what's the horsepower on this thing? I don't know, but look how shiny. I can't believe you bought this."
+    },
+    {
+      "min": 23,
+      "transcript": "So can I have a ride, Steph? Hop in. Get ready for the smoothest ride of your life."
+    },
+    {
+      "min": 24,
+      "transcript": "Damn it! Hey, who's next? You know what? I am going to do something today. I'm not just going to sit around likesome old lady. I'm going to get something pierced. Like my nose or my tongue or something."
+    },
+    {
+      "min": 25,
+      "transcript": "Like my nose or my tongue or something? Really? 'Cause, you know, that hurts."
+    },
+    {
+      "min": 26,
+      "transcript": "So what? You know what, the way I see it- OW! Son of a bitch!"
+    }
+  ]
+}
