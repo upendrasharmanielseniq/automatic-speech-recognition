@@ -1,15 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from schemas import TranscriptRequest, TranscriptChunk
 from inference import predict_content, sliding_window_prediction
-import os
-import json
+import os,json
 # from backend.tmdb_api import enrich_with_metadata
 
 app = FastAPI()
 
 class FileRequest(BaseModel):
     file_name: str 
+
+def parse_txt_to_chunks_from_string(file_text: str):
+    chunks = []
+    lines = file_text.splitlines()
+    for line in lines:
+        if '-->' in line:
+            parts = line.strip().split(']')
+            if len(parts) == 2:
+                timestamp = parts[0].strip('[')
+                transcript = parts[1].strip()
+                start, end = timestamp.split('-->')
+                chunk = TranscriptChunk(
+                    start=start.strip(),
+                    end=end.strip(),
+                    transcript=transcript
+                )
+                chunks.append(chunk)
+    return chunks
 
 def parse_txt_to_chunks(file_path: str):
     chunks = []
@@ -43,25 +60,32 @@ async def predict(transcript: TranscriptRequest):
     print("Request /predict received:", transcript)
     return prediction
 
-@app.post("/predict-from-file")
-async def predict_from_file():
+@app.post("/predictFromUpload")
+async def predictFromUpload(file: UploadFile = File(...)):
     """
     Predict the content from a .txt transcript file, convert to JSON chunks, and return prediction.
-    The file should be placed in the root directory of the project with the name `sample_transcript.txt`.
     """
-    file_path = os.path.join(os.getcwd(), "sample_transcript.txt")
-    if not os.path.exists(file_path):
-        return {"error": "Transcript file not found"}
-
     try:
-        chunks = parse_txt_to_chunks(file_path)
-        json_output_path = os.path.join(os.getcwd(), "sample_transcript.json")
+        file_content = await file.read()
+        for encoding in ['utf-8-sig', 'utf-16', 'iso-8859-1']:
+            try:
+                file_text = file_content.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            raise ValueError("Unable to decode file with supported encodings.")
+        chunks = parse_txt_to_chunks_from_string(file_text)
+
+        json_output_path = os.path.splitext(file.filename)[0] + ".json"
         with open(json_output_path, "w", encoding="utf-8") as json_file:
-            json.dump([chunk.dict() for chunk in chunks], json_file, ensure_ascii=False, indent=2)
+            json.dump({"chunks": [chunk.dict() for chunk in chunks]}, json_file, ensure_ascii=False, indent=2)
+                      
         transcript_request = TranscriptRequest(chunks=chunks)
-        # prediction = predict_content(transcript_request)
-        prediction = sliding_window_prediction(chunks)
-        print("Request /predict received:", transcript_request)
+        prediction = predict_content(transcript_request)
+
+        # prediction = sliding_window_prediction(chunks)
+        print("Request /predictFromUpload received:", transcript_request)
         return prediction
     except Exception as e:
         return {"error": "Failed to process file", "details": str(e)}

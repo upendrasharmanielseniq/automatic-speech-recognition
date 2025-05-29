@@ -18,13 +18,22 @@ client = AzureOpenAI(
 def build_prompt(chunks):
     full_text = " ".join([c.transcript for c in chunks])
     return f"""
-    You are a movie and shows expert. Given a transcript of a movie or show, predict the content of the movie from transcript text.
-    The transcript is: {full_text}
+    You are an expert in identifying TV shows and movies from dialogue transcripts.
+    Given a transcript from a TV show or a movie, analyze the text and predict the following:
+    - The title of the content (use "Unknown" if not obvious)
+    - Whether it is a movie or a TV show
+    - If it is a TV show, return the season and episode numbers (or "N/A" if not known)
+    - The language of the transcript
+    - Confidence in your prediction (1-10 scale)
+    Transcript:
+    \"\"\"
+    {full_text}
+    \"\"\"
 
-    Response format:
-    Title: <Movie or TV Show>
-    Season: <Season number or N/A>
-    Episode: <Episode number or N/A>
+    Respond ONLY in the following format:
+    Title: <Movie or TV Show title>
+    Season: <Season number or "N/A">
+    Episode: <Episode number or "N/A">
     Language: <Detected Language>
     """
 
@@ -54,7 +63,6 @@ def sliding_window_prediction(chunks,window_size=5, step_size=1):
         transcript_request = TranscriptRequest(chunks=window)
         prediction = predict_content(transcript_request)
         
-        # Optional: If prediction is confident, break early
         if prediction.get("title") and prediction["title"].lower() != "unknown":
             return prediction
     
