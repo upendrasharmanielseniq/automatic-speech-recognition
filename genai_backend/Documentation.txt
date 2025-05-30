@@ -14,3 +14,7 @@ Keeping parsing in GenAI allows you to:
 Reuse the endpoint with any client (not just C++).
 
 Easily debug/test using Postman, curl, or browser.
+
+ Given a transcript of a TV Show titled 'Title - SeaEp - Language.txt or a movie titled 'Title (year) - Language.txt' identify: Incorrect
+
+Given a transcript of a TV Show titled Friends - S07E14 - English.txt or a movie titled *Gladiator (2000) - German.txt* identify: Correct

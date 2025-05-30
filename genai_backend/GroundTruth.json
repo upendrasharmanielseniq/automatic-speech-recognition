@@ -1,0 +1,14 @@
+[
+    {
+        "transcript_file": "Friends_s07e14.txt",
+        "true_title": "Friends",
+        "true_season": 7,
+        "true_episode": 14
+    },
+    {
+        "transcript_file": "gladiator_de.txt",
+        "true_title": "gladiator_de",
+        "true_season": "N/A",
+        "true_episode": "N/A"
+    }
+]
