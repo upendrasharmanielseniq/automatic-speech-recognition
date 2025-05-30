@@ -1,4 +1,6 @@
-[
+{
+  "chunks":
+  [
   {
     "start": "00:00:00.000",
     "end": "00:00:05.660",
@@ -380,3 +382,4 @@
     "transcript": "Ergang, wirst du ├╢ffentlich einverstanden sein."
   }
 ]
+}

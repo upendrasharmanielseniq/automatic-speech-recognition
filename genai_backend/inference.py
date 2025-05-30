@@ -18,14 +18,27 @@ client = AzureOpenAI(
 def build_prompt(chunks):
     full_text = " ".join([c.transcript for c in chunks])
     return f"""
-    You are a movie and shows expert. Given a transcript of a movie or show, predict the content of the movie from transcript text.
-    The transcript is: {full_text}
+    You are an expert in identifying TV shows and movies from dialogue transcripts.
+    Given a transcript from a TV show or a movie, identify:
+    1. Title (Required)
+    2. Type (Movie or TV Show)
+    3. If and only if it's a TV show, identify correct **season and episode number** (or reply with "N/A"). **AVOID HALLUCINATING**.
+    4. Detect the **language** of the transcript.
+    5. Provide a **confidence percentage**.
+    6. If a window confidence >= 80%, return the prediction immediately.
 
-    Response format:
-    Title: <Movie or TV Show>
-    Season: <Season number or N/A>
-    Episode: <Episode number or N/A>
+    Transcript:
+    \"\"\"
+    {full_text}
+    \"\"\"
+
+    Respond in the following format, adjust accordingly to movie or TV show:
+    Title: <Movie or TV Show title with year if available or series run time>
+    Type: <Movie or TV Show>
+    Season: <Season number or "N/A"> Omit if N/A
+    Episode: <Episode number or "N/A"> Omit if N/A
     Language: <Detected Language>
+    Confidence: <Confidence score>
     """
 
 def predict_content(transcript):
@@ -48,17 +61,23 @@ def predict_content(transcript):
         print("OpenAI API call failed:", e)
         return {"error": "Prediction failed", "details": str(e)}
 
-def sliding_window_prediction(chunks,window_size=5, step_size=1):
+def sliding_window_prediction(chunks,window_size=10, step_size=2):
+    predictions = []
+
     for i in range(0, len(chunks) - - window_size + 1, step_size):
         window = chunks[i:i + window_size]
         transcript_request = TranscriptRequest(chunks=window)
         prediction = predict_content(transcript_request)
-        
-        # Optional: If prediction is confident, break early
+
+        print(f"Window {i}-{i+window_size}: {prediction}")
+
         if prediction.get("title") and prediction["title"].lower() != "unknown":
-            return prediction
+            if prediction.get("confidence", "0").isdigit() and int(prediction["confidence"]) >= 7:
+                return prediction
+            else:
+                predictions.append(prediction)
     
-    return {"error": "No confident prediction in any window"}
+    return predictions[0] if predictions else {"error": "No confident prediction in any window"}
     
 def parse_response(text):
     lines = text.strip().split("\n")
