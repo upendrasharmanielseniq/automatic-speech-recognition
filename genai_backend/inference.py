@@ -21,10 +21,11 @@ def build_prompt(chunks):
     You are an expert in identifying TV shows and movies from dialogue transcripts.
     Given a transcript from a TV show or a movie, identify:
     1. Title (Required)
-    2. If and only if it's a TV show, identify correct **season and episode number** (or reply with "N/A"). **AVOID HALLUCINATING**.
-    3. Detect the **language** of the transcript.
-    4. Provide a **confidence percentage**.
-    5. If a window confidence >= 80%, return the prediction immediately.
+    2. Type (Movie or TV Show)
+    3. If and only if it's a TV show, identify correct **season and episode number** (or reply with "N/A"). **AVOID HALLUCINATING**.
+    4. Detect the **language** of the transcript.
+    5. Provide a **confidence percentage**.
+    6. If a window confidence >= 80%, return the prediction immediately.
 
     Transcript:
     \"\"\"
@@ -33,6 +34,7 @@ def build_prompt(chunks):
 
     Respond in the following format, adjust accordingly to movie or TV show:
     Title: <Movie or TV Show title with year if available or series run time>
+    Type: <Movie or TV Show>
     Season: <Season number or "N/A"> Omit if N/A
     Episode: <Episode number or "N/A"> Omit if N/A
     Language: <Detected Language>

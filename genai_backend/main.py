@@ -5,7 +5,17 @@ from inference import predict_content, sliding_window_prediction
 import os,json
 # from backend.tmdb_api import enrich_with_metadata
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class FileRequest(BaseModel):
     file_name: str 
@@ -82,8 +92,8 @@ async def predictFromUpload(file: UploadFile = File(...)):
             json.dump({"chunks": [chunk.dict() for chunk in chunks]}, json_file, ensure_ascii=False, indent=2)
                       
         transcript_request = TranscriptRequest(chunks=chunks)
-        # prediction = predict_content(transcript_request)
-        prediction = sliding_window_prediction(chunks)
+        prediction = predict_content(transcript_request)
+        # prediction = sliding_window_prediction(chunks)
 
         # prediction = sliding_window_prediction(chunks)
         print("Request /predictFromUpload received.")
