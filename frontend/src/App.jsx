@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ListenButton from './components/ListenButton';
 import PredictButton from './components/PredictButton';
 import TranscriptDisplay from './components/TranscriptDisplay';
+import BatchUploader from './components/BatchUploader';
 import { uploadTranscript } from './services/api';
 // import { triggerListening } from './services/api';
 import './App.css';
@@ -67,6 +68,7 @@ const handlePredict = async () => {
             </div>
            <TranscriptDisplay result={prediction} metadata={metadata}/>
             {loading && <p className="text-center mt-4 text-blue-600">Predicting...</p>}
+            <BatchUploader />
         </div>
     );
 };

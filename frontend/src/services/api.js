@@ -25,6 +25,16 @@ export const triggerListening = async (audioFile) => {
      return response.data;
 };
 
+export const uploadBatchTranscripts = async (files) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+    return axios.post (`${API_BASE_GENAI}/batchPredict`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    });
+}
+
 // export const fetchTmdbMetadata = async (title) => {
 //   try {
 //     const response = await axios.get(
