@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\x64\Release\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\bench.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\ggml-base.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\ggml-cpu.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\ggml.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\whisper.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\main.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\quantize.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\test-vad.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\test-vad-full.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\vad-speech-segments.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\whisper-bench.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\whisper-cli.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\bin\Release\whisper-server.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\x64\Release\ALL_BUILD</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

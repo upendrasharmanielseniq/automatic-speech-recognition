@@ -1,0 +1,10 @@
+^C:\USERS\SHUP4001.T9\PROJECT\AUTOMATIC-SPEECH-RECOGNITION\WHISPER.CPP\EXAMPLES\VAD-SPEECH-SEGMENTS\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp -BC:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp --check-stamp-file C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/vad-speech-segments/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
