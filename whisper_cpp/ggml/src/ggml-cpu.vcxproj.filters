@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-aarch64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-hbm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-quants.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-traits.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\amx\amx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\amx\mmq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\binary-ops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\unary-ops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\vec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-aarch64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-hbm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-quants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\amx\amx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\amx\mmq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ggml-cpu-impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\binary-ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\unary-ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\simd-mappings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\vec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\ggml-cpu\ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\shup4001.T9\Project\automatic-speech-recognition\whisper.cpp\ggml\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{35FCEA4B-36ED-3655-A5D8-D191911E6297}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1BEEA429-9846-31CA-82DB-7ABADB5F4DC4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

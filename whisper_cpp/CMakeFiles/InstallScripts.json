@@ -1,0 +1,19 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/ggml/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/ggml/src/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/ggml/src/ggml-cpu/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/src/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/tests/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/cli/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/bench/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/server/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/quantize/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/vad-speech-segments/cmake_install.cmake",
+		"C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/examples/deprecation-warning/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

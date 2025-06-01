@@ -1,0 +1,1 @@
+C:/Users/shup4001.T9/Project/automatic-speech-recognition/whisper.cpp/src/whisper.dir/MinSizeRel/whisper.obj
