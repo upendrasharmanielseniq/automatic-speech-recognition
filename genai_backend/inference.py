@@ -18,28 +18,33 @@ client = AzureOpenAI(
 def build_prompt(chunks):
     full_text = " ".join([c.transcript for c in chunks])
     return f"""
+  
     You are an expert in identifying TV shows and movies from dialogue transcripts.
-    Given a transcript from a TV show or a movie, identify:
-    1. Title (Required)
-    2. Type (Movie or TV Show)
-    3. If and only if it's a TV show, identify correct **season and episode number** (or reply with "N/A"). **AVOID HALLUCINATING**.
+
+    Your task is to analyze the following transcript and determine:
+    1. **Title** of the show or movie (include year or series run if known).
+    2. **Type**: Movie or TV Show.
+    3. If it's a TV show, provide the **correct season and episode number** (or reply with "N/A" if not identifiable). Do **not** guess.
     4. Detect the **language** of the transcript.
-    5. Provide a **confidence percentage**.
-    6. If a window confidence >= 80%, return the prediction immediately.
+    5. Provide a **confidence percentage** (0-100%).
+    6. If confidence is **80% or higher**, return the prediction immediately.
+
+    Use context clues such as character names, plot points, and dialogue. Avoid hallucination and only respond if you are reasonably certain.
 
     Transcript:
     \"\"\"
     {full_text}
     \"\"\"
 
-    Respond in the following format, adjust accordingly to movie or TV show:
-    Title: <Movie or TV Show title with year if available or series run time>
+    Respond in this format:
+    Title: <Movie or TV Show title with year or series run>
     Type: <Movie or TV Show>
-    Season: <Season number or "N/A"> Omit if N/A
-    Episode: <Episode number or "N/A"> Omit if N/A
+    Season: <Season number or "N/A"> # Omit if N/A
+    Episode: <Episode number or "N/A"> # Omit if N/A
     Language: <Detected Language>
     Confidence: <Confidence score>
     """
+
 
 def predict_content(transcript):
     """
