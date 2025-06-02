@@ -1,14 +1,18 @@
 import subprocess
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, scrolledtext
 import os
 import platform
 import datetime
+import threading
+import re
+import json
 
 whisper_process = None
+final_output_path = ""
 
 def run_whisper():
-    global whisper_process
+    global whisper_process, final_output_path
 
     audio_file = audio_entry.get().strip()
     model_file = model_entry.get().strip()
@@ -26,7 +30,6 @@ def run_whisper():
     model_path = os.path.join("whisper_cpp", "models", model_file)
     audio_path = os.path.join("whisper_cpp", "samples", audio_file)
 
-    # Auto-generate output file if empty
     if not output_file:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = os.path.join("whisper_cpp", "output", f"transcript_{timestamp}.txt")
@@ -34,77 +37,126 @@ def run_whisper():
         if not os.path.isabs(output_file):
             output_file = os.path.join("whisper_cpp", "output", output_file)
 
-    # Ensure the output directory exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    final_output_path = output_file
 
     cmd = [
         cli_path,
         "-m", model_path,
         "-f", audio_path,
-        "-t", threads,
-        output_file
+        "-l", "auto",
+        "-t", threads
     ]
 
-    try:
-        whisper_process = subprocess.Popen(cmd)
-        run_button.config(state=tk.DISABLED)
-        stop_button.config(state=tk.NORMAL)
-        root.after(100, check_process)
-    except Exception as e:
-        messagebox.showerror("Error", f"Failed to start whisper-cli.\n\nError:\n{e}")
-        run_button.config(state=tk.NORMAL)
-        stop_button.config(state=tk.DISABLED)
+    def read_output():
+        nonlocal output_file
+        try:
+            with open(output_file, "w", encoding="utf-8") as out_f:
+                whisper_process = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    text=True, encoding='utf-8', errors='replace', bufsize=1
+                )
+                run_button.config(state=tk.DISABLED)
+                stop_button.config(state=tk.NORMAL)
+                convert_button.config(state=tk.DISABLED)
 
-def check_process():
-    global whisper_process
-    if whisper_process is not None:
-        retcode = whisper_process.poll()
-        if retcode is None:
-            root.after(100, check_process)
-        else:
-            if retcode == 0:
-                messagebox.showinfo("Success", "Transcription completed successfully.")
-            else:
-                messagebox.showerror("Error", f"whisper-cli exited with status {retcode}.")
+                for line in whisper_process.stdout:
+                    lang_conf_match = re.search(r"auto-detected language:\s*([a-z]{2})\s*\(p\s*=\s*([0-9.]+)\)", line)
+                    if lang_conf_match:
+                        language_var.set(lang_conf_match.group(1))
+                        confidence_var.set(lang_conf_match.group(2))
+
+                    if re.match(r"\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]", line):
+                        output_text.insert(tk.END, line)
+                        output_text.see(tk.END)
+                        out_f.write(line)
+
+                whisper_process.wait()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to run whisper: {e}")
+        finally:
             run_button.config(state=tk.NORMAL)
             stop_button.config(state=tk.DISABLED)
-            whisper_process = None
+            convert_button.config(state=tk.NORMAL)  # Enable JSON button
+
+    threading.Thread(target=read_output, daemon=True).start()
 
 def stop_whisper():
     global whisper_process
-    if whisper_process is not None:
+    if whisper_process:
         whisper_process.terminate()
-        whisper_process = None
         run_button.config(state=tk.NORMAL)
         stop_button.config(state=tk.DISABLED)
-        messagebox.showinfo("Stopped", "Transcription has been stopped.")
+
+def convert_to_json():
+    global final_output_path
+
+    if not os.path.exists(final_output_path):
+        messagebox.showerror("Error", "Transcription output file not found.")
+        return
+
+    json_output_path = final_output_path.replace(".txt", ".json")
+    json_data = []
+
+    try:
+        with open(final_output_path, "r", encoding="utf-8") as f:
+            for line in f:
+                match = re.match(r"\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\](.*)", line)
+                if match:
+                    start, end, text = match.groups()
+                    json_data.append({
+                        "start": start.strip(),
+                        "end": end.strip(),
+                        "text": text.strip()
+                    })
+
+        with open(json_output_path, "w", encoding="utf-8") as jf:
+            json.dump(json_data, jf, ensure_ascii=False, indent=2)
+
+        messagebox.showinfo("Success", f"Transcript converted to JSON:\n{json_output_path}")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to convert to JSON: {e}")
 
 # GUI Setup
 root = tk.Tk()
 root.title("Whisper.cpp Transcription GUI")
 
-tk.Label(root, text="Audio File (e.g., audio.mp3):").grid(row=0, column=0, sticky='e', padx=5, pady=5)
-audio_entry = tk.Entry(root, width=40)
-audio_entry.grid(row=0, column=1, padx=5)
+frame = tk.Frame(root, padx=10, pady=10)
+frame.pack()
 
-tk.Label(root, text="Model File (e.g., ggml-base.en.bin):").grid(row=1, column=0, sticky='e', padx=5, pady=5)
-model_entry = tk.Entry(root, width=40)
-model_entry.grid(row=1, column=1, padx=5)
+fields = [
+    ("Audio File (inside samples_folder/):", "audio_entry"),
+    ("Model File (inside models/):", "model_entry"),
+    ("Output File Name (.txt, optional):", "output_entry"),
+    ("Number of Threads:", "threads_entry")
+]
 
-tk.Label(root, text="Output File (optional):").grid(row=2, column=0, sticky='e', padx=5, pady=5)
-output_entry = tk.Entry(root, width=40)
-default_output = f"transcript_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-output_entry.insert(0, default_output)
-output_entry.grid(row=2, column=1, padx=5)
+for label_text, var_name in fields:
+    tk.Label(frame, text=label_text).pack(anchor="w")
+    entry = tk.Entry(frame, width=50)
+    entry.pack(anchor="w", pady=2)
+    globals()[var_name] = entry
 
-tk.Label(root, text="Threads (-t):").grid(row=3, column=0, sticky='e', padx=5, pady=5)
-threads_entry = tk.Entry(root, width=10)
-threads_entry.grid(row=3, column=1, sticky='w', padx=5)
+language_var = tk.StringVar()
+tk.Label(frame, text="Language Detected:").pack(anchor="w")
+language_label = tk.Label(frame, textvariable=language_var, fg="blue")
+language_label.pack(anchor="w")
 
-run_button = tk.Button(root, text="Run", command=run_whisper)
-run_button.grid(row=4, column=0, pady=15)
+confidence_var = tk.StringVar()
+tk.Label(frame, text="Confidence:").pack(anchor="w")
+confidence_label = tk.Label(frame, textvariable=confidence_var, fg="green")
+confidence_label.pack(anchor="w")
 
-stop_button = tk.Button(root, text="Stop", command=stop_whisper, state=tk.DISABLED)
-stop_button.grid(row=4, column=1, pady=15, sticky='w')
+run_button = tk.Button(frame, text="Run Transcription", command=run_whisper)
+run_button.pack(pady=(10, 0))
+
+stop_button = tk.Button(frame, text="Stop", state=tk.DISABLED, command=stop_whisper)
+stop_button.pack(pady=(5, 0))
+
+convert_button = tk.Button(frame, text="Convert to JSON", state=tk.DISABLED, command=convert_to_json)
+convert_button.pack(pady=(5, 10))
+
+output_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=100, height=30, font=("Courier", 10))
+output_text.pack(padx=10, pady=(0, 10))
 
 root.mainloop()
