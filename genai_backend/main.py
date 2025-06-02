@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from schemas import TranscriptRequest, TranscriptChunk
-from inference import predict_content, sliding_window_prediction
+from inference import predict_content, sliding_window_prediction, predict_content_chain
 import os,json
 import csv, io
 from fastapi.responses import StreamingResponse
@@ -94,7 +94,8 @@ async def predictFromUpload(file: UploadFile = File(...)):
             json.dump({"chunks": [chunk.dict() for chunk in chunks]}, json_file, ensure_ascii=False, indent=2)
                       
         transcript_request = TranscriptRequest(chunks=chunks)
-        prediction = predict_content(transcript_request)
+        # prediction = predict_content(transcript_request)
+        prediction = predict_content_chain(transcript_request)
         # prediction = sliding_window_prediction(chunks)
         print("Request /predictFromUpload received.")
         return prediction
