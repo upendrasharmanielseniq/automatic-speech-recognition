@@ -14,32 +14,36 @@ client = AzureOpenAI(
     azure_endpoint=AZURE_OPENAI_ENDPOINT
 )
 
-
 def build_prompt(chunks):
     full_text = " ".join([c.transcript for c in chunks])
     return f"""
+  
     You are an expert in identifying TV shows and movies from dialogue transcripts.
-    Given a transcript from a TV show or a movie, identify:
-    1. Title (Required)
-    2. Type (Movie or TV Show)
-    3. If and only if it's a TV show, identify correct **season and episode number** (or reply with "N/A"). **AVOID HALLUCINATING**.
+
+    Your task is to analyze the following transcript and determine:
+    1. **Title** of the show or movie (include year or series run if known).
+    2. **Type**: Movie or TV Show.
+    3. If it's a TV show, provide the **correct season and episode number** (or reply with "N/A" if not identifiable). Do **not** guess.
     4. Detect the **language** of the transcript.
-    5. Provide a **confidence percentage**.
-    6. If a window confidence >= 80%, return the prediction immediately.
+    5. Provide a **confidence percentage** (0-100%).
+    6. If confidence is **80% or higher**, return the prediction immediately.
+
+    Use context clues such as character names, plot points, and dialogue. Avoid hallucination and only respond if you are reasonably certain.
 
     Transcript:
     \"\"\"
     {full_text}
     \"\"\"
 
-    Respond in the following format, adjust accordingly to movie or TV show:
-    Title: <Movie or TV Show title with year if available or series run time>
+    Respond in this format:
+    Title: <Movie or TV Show title with year or series run>
     Type: <Movie or TV Show>
-    Season: <Season number or "N/A"> Omit if N/A
-    Episode: <Episode number or "N/A"> Omit if N/A
+    Season: <Season number or "N/A"> # Omit if N/A
+    Episode: <Episode number or "N/A"> # Omit if N/A
     Language: <Detected Language>
     Confidence: <Confidence score>
     """
+
 
 def predict_content(transcript):
     """
@@ -61,13 +65,107 @@ def predict_content(transcript):
         print("OpenAI API call failed:", e)
         return {"error": "Prediction failed", "details": str(e)}
 
-def sliding_window_prediction(chunks,window_size=10, step_size=2):
+def predict_content_chain(transcript):
+    """
+    Predict the content of a transcription.
+    """
+    
+    try:
+
+        full_transcript = " ".join([c.transcript for c in transcript.chunks])
+        prompt = f"You are an expert in identifying TV shows and movies from dialogue transcripts. Identify only the name of the TV show or the movie as a single string from below transcript: \n\n{full_transcript}"
+        # prompt = build_prompt_chain(transcript.chunks)
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "system", "content": "You are a streaming content classifier."},
+                {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=500
+                )
+        
+        movie_show_name = response.choices[0].message.content.strip()
+        print(f"MOVIE SHOW NAME: {movie_show_name}")
+
+        prompt = f"You are an expert in summarizing transcripts from any language to English. Summarize the below transcript in English. \n\n{full_transcript}"
+        # prompt = build_prompt_chain(transcript.chunks)
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=500
+                )
+        
+        summary = response.choices[0].message.content.strip()
+
+        print(f"SUMMARY: {summary}")
+
+        prompt = f"""You are an expert in identifying the Episode Name of the TV shows given the name, summary of the transcript and the transcript. Search the internet for the episode name of the TV show {movie_show_name}. Only consider URLs that contain the keyword like {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries, \n\n {movie_show_name} episode where {summary}.
+        Step-by-step: \n Formulate a search query. \n Filter results to include only URLs with "TV show", "Series", {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries". \n\n If {movie_show_name} is not a TV show return "N/A" else only Episode Name.\n\n Name is {movie_show_name} \n\n Summary is: {summary} \n\n Transcript is: {full_transcript} \n\n Only provide the episode name. Don't provide detailed explanation in the output"""
+
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=500
+                )
+        episode_name = response.choices[0].message.content.strip()
+        print(f"EPISODE NAME: {episode_name}")
+
+        prompt = f"""You are an expert in identifying the season of the TV show given the name of the show and episode name. Google search the name of the TV show, name of the episode and provide the results and take the information from IMDB website as reliable. Verify the season number from reliable sources. Use the latest updated information. Think Step by Step. \n\n If {movie_show_name} is not a TV show return "N/A" else only Season Number.\n\n Name is {movie_show_name} \n\n \n\n \n\n Episode Name is: {episode_name} \n\n Provide the explanation as output"""
+
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                # {"role": "system", "content": "You are a streaming content classifier."},
+                {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=500
+                )
+        season = response.choices[0].message.content.strip()
+        print(f"SEASON EXPLANATION: {season}")
+
+        prompt = f"""You are an expert in verifying TV show and movie details. Given the TV show or movie name, Explanation for season number, Episode Name and Transcript, you need to provide a language of the transcript, episode number along with confidence for prediction. Google search the name of the TV show, name of the episode and provide the results and take the information on IMDB website as reliable where there are keywords like {episode_name}. Verify the episode number from reliable sources. Use the latest updated information. Think Step by step.
+        Respond in the following format, adjust accordingly to movie or TV show:
+        Title: <Movie or TV Show title with year if available or series run time>
+        Type: <Movie or TV Show>
+        Season: <Season number or "N/A"> Omit if N/A
+        Episode: <Episode number or "N/A"> Omit if N/A
+        Language: <Detected Language>
+        Confidence: <Confidence percentage> n\n Name is {movie_show_name} \n\n Season number explanation is {season} \n\n Episode name is: {episode_name} \n\n Transcript is: {full_transcript}"""
+
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "system", "content": "You are a streaming content classifier."},
+                {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=500
+                )
+        
+        final_output = response.choices[0].message.content.strip()
+        
+        print(f"FINAL OUTPUT: \n {final_output}")
+        
+        return parse_response(final_output)
+    except Exception as e:
+        print("OpenAI API call failed:", e)
+        return {"error": "Prediction failed", "details": str(e)}
+
+def sliding_window_prediction(chunks,window_size=2000, step_size=400):
     predictions = []
 
     for i in range(0, len(chunks) - - window_size + 1, step_size):
         window = chunks[i:i + window_size]
         transcript_request = TranscriptRequest(chunks=window)
-        prediction = predict_content(transcript_request)
+        prediction = predict_content_chain(transcript_request)
 
         print(f"Window {i}-{i+window_size}: {prediction}")
 
