@@ -1,51 +1,107 @@
-# Automatic Speech Recognition
+# Speech-to-Text GenAI Classifier
+This project is a production-grade backend for identifying TV Shows, Movies, or Episodes from speech transcript text using Azure OpenAI's GPT-4o-mini model. It is designed to work alongside embedded C++ speech-to-text systems (e.g., Whisper.cpp or Vosk) and provides a clean API for transcript-based content classification.
 
-## Overview
-We are utilizing the **Whisper CPP** open-source library for real-time transcription.
+---
 
-### Why Whisper CPP?
-- **Lightweight & Dependency-Free**: Minimal setup required.
-- **Efficient Processing**: Optimized performance for real-time applications.
-- **C-style API**: Simplifies integration across various platforms.
-- **Multilingual Support**: Dynamically detects languages during runtime.
-- **Accuracy & Robustness**: Maintains high transcription precision.
+## Features
+🔊 Real-time or batch transcript ingestion (JSON or `.txt`)
+🧠 GenAI-powered classification (Azure OpenAI GPT-4o-mini)
+🎬 Returns title, season, episode, language and confidence
+⚙️ Designed to work with embedded C++ STT modules
+🧩 Easily extendable with TMDb metadata and frontend UI
 
-## Considered Alternatives
-We evaluated **VOSK** but found that:
-- It lacks a **unified model** for multilingual transcription.
-- Requires separate models for different languages.
-- Unable to **auto-detect** language during runtime.
+---
 
-Thus, Whisper CPP was selected for its ability to **identify audio language dynamically** without requiring predefined models.
+## API Endpoints
+### `POST /predictFromUpload` 
+### `POST /batchPredict` 
+**Request Body:**
+```txt
+{
+    "chunks": [
+        { "minute": 0, "transcript": "In a world where one man breaks bad."},
+        { "minute": 1, "transcript": "Heisenberg just made a deal with Tuco."}
+    ]
+}
+```
 
-## Chosen Model in Whisper CPP
-We are using **ggml-small-q8_0**, a quantized version of the small model. Below are key differences:
+### Response:
+```json
+{
+    "title": "Breaking Bad",
+    "season": "1",
+    "episode": "1",
+    "language": "English"
+    "confidence": "95%"
+}
+```
 
-| Feature           | ggml-small.bin (Full Precision) | ggml-small-q8_0.bin (Quantized) |
-|-------------------|--------------------------------|----------------------------------|
-| **Weight Precision** | FP32 or FP16 | 8-bit integers (q8_0 quantization) |
-| **File Size** | Large | Smaller |
-| **Accuracy** | Highest (reference) | Very close to full precision, minimal loss |
-| **Inference Speed** | Slower | Faster |
-| **Memory Usage** | High | Lower |
-| **Use Case** | Maximum accuracy with abundant resources | Balanced accuracy, speed & lower memory footprint |
+## Setup
+### 1. Clone this Repository
+```
+git clone https://github.com/upendrasharmanielseniq/automatic-speech-recognition.git
+cd genai-backend
+```
+### 2. Setup Environment
+```
+python -m venv venv
+venv\Scripts\activate # Windows
+source venv/bin/activate # macOS/Linux
 
-In essence, `ggml-small-q8_0.bin` is a compressed version optimized for performance and reduced CPU load, with **minimal accuracy trade-off**. For most real-time applications, **q8_0** or **q5_k_m** models are highly recommended.
+```
+### 3. Install Dependencies
+```
+pip install -r requirements.txt
+```
 
-## Setting Up Whisper CPP
-### Commands for Installation:
-```sh
-cmake . --fresh
-msbuild ALL_BUILD.vcxproj /p:Configuration=Release
+### 4. Configure Environment Variables
+Create a .env file in the root directory:
+```
+AZURE_OPENAI_KEY=<paste your azure_openai_key here without " ">
+AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
+```
 
-Download Model:
-curl <model download url> -o models/<model-name>.bin
+## Running the genai-backend
+```
+uvicorn main:app --reload
+```
+Or with explicit PYTHONPATH:
+```
+$env:PYTHONPATH = "."; uvicorn backend.main:app --reload # Powershell
+# OR
+PYTHONPATH=. uvicorn backend.main:app --reload # Bash/macOS
+```
 
-Running Whisper CPP:
-.\whisper-cli -m models/<model-name>.bin -f samples/<audio>.mp3 -t 8
-.\whisper-cli -m models/ggml-small-q8_0.bin -f samples/<audio>.mp3 -l auto -t 4
+## Running the frontend
+```
+1. Make sure you have node.js installed
+2. Check node version by going into the terminal - Open cmd
+node -v
+npm -v
+cd frontend
+npm install (This installs the dependencies from package.json)
+npm run start
+```
 
-Here, -t 4 specifies the use of 4 CPU threads for transcription.
+## Testing
 
-Gen-AI Component
-(Reserved space for Gen-AI-related content 🚀)
+```
+The genai-backend runs on localhost:8000
+The frontend UI runs on localhost:3000
+
+```
+Make sure you have your backend running to test the application from the UI.
+
+## Roadmap to test and explore
+- Uncomment the sliding window function in main.py to test the sliding window approach
+
+## TBD
+- Integrate RAT and SQUEAK (Whisper C++ with GenAI model to develop an integrated solution)
+- Deploy via Docker / Azure App Service
+
+## License
+MIT License
+
+## Author
+Developed by Media Maverick - Team MM for Hackfest 2025
