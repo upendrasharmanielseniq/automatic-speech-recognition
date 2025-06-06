@@ -54,22 +54,47 @@ const handlePredict = async () => {
 };
 
     return (
-        <div className="container">
-            <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-            🎬 Content Classifier
-            </h1>
-            <ListenButton
-                // onAudioSelect={handleAudioSelect}
-                onTxtFileReceived={handleTxtFile }
-                // onListen={handleListen}
-            />
-            <div className="flex justify-center mt-4">
-                <PredictButton onPredict={handlePredict} isDisabled={!txtFile} />
-            </div>
-           <TranscriptDisplay result={prediction} metadata={metadata}/>
-            {loading && <p className="text-center mt-4 text-blue-600">Predicting...</p>}
-            <BatchUploader />
-        </div>
+      <div
+        className="container min-vh-100 bg-light py-5"
+        style={{
+          background: "linear-gradient(to bottom right, #0d3f8, #faffff)",
+        }}
+      >
+        <header className="text-center mb-5">
+          <img
+            src="/assets/RAT_SQUEAK.jpeg"
+            alt="Rat Squeak Logo"
+            className="img-fluid rounded-circle shadow mb-3"
+            style={{ width: "250px", height: "auto", objectFit: "cover" }}
+          />
+          <h2 className="fs-5 text-secondary fst-italic">
+            Real-time Insight Engine
+          </h2>
+        </header>
+
+        <section className="mb-5">
+          <h3 className="h5 fw-semibold text-dark mb-3">
+            Predict from Single Transcript File
+          </h3>
+          <div className="mb-3">
+            <ListenButton onTxtFileReceived={handleTxtFile} />
+          </div>
+          <div className="d-flex justify-content-center mb-3">
+            <PredictButton onPredict={handlePredict} isDisabled={!txtFile} />
+          </div>
+          <TranscriptDisplay result={prediction} metadata={metadata} />
+          {loading && (
+            <p className="text-center text-primary mt-3">Predicting...</p>
+          )}
+        </section>
+
+        <section>
+          <h3 className="h5 fw-semibold text-dark mb-3">
+            Bulk Prediction from Multiple Transcript Files
+          </h3>
+          <BatchUploader />
+        </section>
+      </div>
     );
 };
 
