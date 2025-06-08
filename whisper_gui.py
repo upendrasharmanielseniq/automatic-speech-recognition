@@ -49,7 +49,7 @@ def run_whisper_stream():
         "-t", threads,
         "--step", "0",
         "--length", "5000",
-        "--vth", "0.6"
+        # "--vth", "0.6"
     ]
 
     print("Running:", " ".join(cmd))

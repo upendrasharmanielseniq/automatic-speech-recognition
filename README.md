@@ -61,6 +61,42 @@ AZURE_OPENAI_KEY=<paste your azure_openai_key here without " ">
 AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
 AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 ```
+### 5. Configure RAT
+cd inside automatic-speech-recognition/whisper_cpp folder
+run following commands in the same order
+
+✅ 1. Remove any old build
+rm -rf build
+mkdir build
+cd build
+
+✅ 2. Run CMake
+cmake .. -DWHISPER_BUILD_STREAM=ON
+
+💡 If you're missing SDL2, and CMake gives you an error, install it:
+brew install sdl2
+
+✅ 3. Build the binaries
+cmake --build . --config Release
+
+
+## Running RAT(Realtime Audio Transcriptor)
+In order to run RAT, pre-configured GUI can be used which gives user power to choose options based upon the requirement.
+✅  Run GUI
+brew install python-tk
+python3 whisper_gui.py
+
+This command will bring up the gui:
+1. Select which model you want to use(select higher moder for accurate and quick results)
+2. Input a output filename, followed by .txt extention. 
+   If no name is entered, RAT automatically generated a file name <timestamp>.txt.
+3. Select number of threads you want to be executed in parallel, by default it is 4(min 4 required).
+4. Click Listen button, RAT will start listening process via whisper.
+5. Play any audio, RAT will pick it up from michrophone and will transcribe it in realtime. Transcribed output can be found in output file in output folder. 
+Also some metrics related to audio can be found on the GUI itself.
+6. Click stop to stop RAT from listening your audio.
+7. Click on convert to JSON, if you also want to have a JSON file from your txt output file.
+
 
 ## Running the genai-backend
 ```
