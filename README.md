@@ -66,25 +66,41 @@ cd inside automatic-speech-recognition/whisper_cpp folder
 run following commands in the same order
 
 ✅ 1. Remove any old build
+```
 rm -rf build
+```
+```
 mkdir build
+```
+```
 cd build
+```
 
 ✅ 2. Run CMake
+```
 cmake .. -DWHISPER_BUILD_STREAM=ON
+```
 
 💡 If you're missing SDL2, and CMake gives you an error, install it:
+```
 brew install sdl2
+```
 
 ✅ 3. Build the binaries
+```
 cmake --build . --config Release
+```
 
 
 ## Running RAT(Realtime Audio Transcriptor)
 In order to run RAT, pre-configured GUI can be used which gives user power to choose options based upon the requirement.
 ✅  Run GUI
+```
 brew install python-tk
+```
+```
 python3 whisper_gui.py
+```
 
 This command will bring up the gui:
 1. Select which model you want to use(select higher moder for accurate and quick results)
