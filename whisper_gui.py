@@ -48,7 +48,8 @@ def run_whisper_stream():
         "-l", "auto",
         "-t", threads,
         "--step", "0",
-        "--length", "5000"
+        "--length", "5000",
+        "--vth", "0.6"
     ]
 
     print("Running:", " ".join(cmd))
@@ -139,7 +140,18 @@ def convert_to_json():
 
 # === GUI ===
 root = tk.Tk()
-root.title("Whisper.cpp Streaming Transcriptor")
+root.title("RAT(Realtime Audio Transcriptor)")
+
+# Set window size (optional)
+root.geometry("800x600")  # Adjust to your actual window size
+
+# Load image
+image = tk.PhotoImage(file="./RAT_SQUEAK.png")
+
+# Create label and place it in the top-right corner
+image_label = tk.Label(root, image=image, borderwidth=0)
+image_label.place(relx=1.0, rely=0.0, anchor='ne')  # Top-right corner
+
 
 frame = tk.Frame(root, padx=10, pady=10)
 frame.pack()
