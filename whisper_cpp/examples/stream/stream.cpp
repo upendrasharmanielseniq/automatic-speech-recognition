@@ -14,19 +14,6 @@
 #include <thread>
 #include <vector>
 
-#include <chrono>
-#include <iomanip>
-#include <ctime>
-
-std::string current_time_str() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t time_now = std::chrono::system_clock::to_time_t(now);
-
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time_now), "[%Y-%m-%d %H:%M:%S] ");
-    return ss.str();
-}
-
 // command-line parameters
 struct whisper_params {
     int32_t n_threads  = std::min(4, (int32_t) std::thread::hardware_concurrency());
@@ -382,9 +369,8 @@ int main(int argc, char ** argv) {
                     } else {
                         const int64_t t0 = whisper_full_get_segment_t0(ctx, i);
                         const int64_t t1 = whisper_full_get_segment_t1(ctx, i);
-                        
-                        std::string time_prefix = current_time_str();
-                        std::string output = time_prefix + "[" + to_timestamp(t0, false) + " --> " + to_timestamp(t1, false) + "]  " + text;
+
+                        std::string output = "[" + to_timestamp(t0, false) + " --> " + to_timestamp(t1, false) + "]  " + text;
 
                         if (whisper_full_get_segment_speaker_turn_next(ctx, i)) {
                             output += " [SPEAKER_TURN]";
