@@ -70,6 +70,9 @@ const handlePredict = async () => {
           <h2 className="fs-5 text-secondary fst-italic">
             Real-time Insight Engine
           </h2>
+          <h3 className="fs-5 text-secondary fst-italic">
+            From Sound to Sense
+          </h3>
         </header>
 
         <section className="mb-5">
