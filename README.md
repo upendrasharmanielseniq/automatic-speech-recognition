@@ -31,7 +31,7 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
     "title": "Breaking Bad",
     "season": "1",
     "episode": "1",
-    "language": "English"
+    "language": "English",
     "confidence": "95%"
 }
 ```
@@ -40,7 +40,7 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
 ### 1. Clone this Repository
 ```
 git clone https://github.com/upendrasharmanielseniq/automatic-speech-recognition.git
-cd genai-backend
+cd genai_backend
 ```
 ### 2. Setup Environment
 ```
