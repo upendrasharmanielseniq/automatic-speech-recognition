@@ -40,7 +40,7 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
 ### 1. Clone this Repository
 ```
 git clone https://github.com/upendrasharmanielseniq/automatic-speech-recognition.git
-cd genai-backend
+cd genai_backend
 ```
 ### 2. Setup Environment
 ```
@@ -55,7 +55,7 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configure Environment Variables
-Create a .env file in the root directory:
+Create a .env file in the root directory(inside genai_backend):
 ```
 AZURE_OPENAI_KEY=<paste your azure_openai_key here without " ">
 AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
