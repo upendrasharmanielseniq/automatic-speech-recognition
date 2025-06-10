@@ -341,6 +341,84 @@ def sliding_window_prediction(chunks,window_size=2000, step_size=400):
     
     return predictions[0] if predictions else {"error": "No confident prediction in any window"}
     
+
+def is_valid(value):
+    return value and isinstance(value, str) and value.lower() != "unknown"
+
+def sliding_window_prediction_new(chunks, max_minutes=5):
+    predictions = []
+
+    for window_size in range(1, min(len(chunks), max_minutes) + 1):
+        window = chunks[:window_size]
+        transcript_request = TranscriptRequest(chunks=window)
+        prediction = predict_content_chain_new(transcript_request)
+
+        print(f"Window 0-{window_size}: {prediction}")
+
+        title = prediction.get("title", "").lower()
+        language = prediction.get("language", "").lower()
+        season = prediction.get("season", "").lower()
+        episode = prediction.get("episode", "").lower()
+        confidence = prediction.get("confidence", "0")
+
+        if not title or title == "unknown" or language == "unknown":
+            continue
+        if not confidence.isdigit() or int(confidence) < 7:
+            continue
+
+        if "tv" in title or "season" in season or "episode" in episode:
+            if season == "n/a" or episode == "n/a" or season == "unknown" or episode == "unknown":
+                continue
+
+        return prediction
+    
+    return predictions[-1] if predictions else {"error": "No confident prediction in any window"}
+    #     if is_valid(prediction.get("title")): score += 1
+    #     if is_valid(prediction.get("language")): score += 1
+
+    #     content_type = prediction.get("type", "").lower()
+    #     if content_type == "tv show":
+    #         if is_valid(prediction.get("season")): score += 1
+    #         if is_valid(prediction.get("episode")): score += 1
+
+    #     conf = int(prediction.get("confidence", "0")) if prediction.get("confidence", "0").isdigit() else 0
+    #     score += conf
+
+    #     if score > highest_confidence:
+    #         highest_confidence = score
+    #         best_prediction = prediction
+        
+    #     if content_type == "tv show" and score >= 5 and conf >= 8:
+    #         return prediction
+    #     elif content_type == "movie" and score >= 3 and conf >= 8:
+    #         return prediction
+    #     print(f"Window 0-{window_size}: {prediction}")
+    # return best_prediction if best_prediction else {"error": "No confident prediction in any window"}
+# ---------------------------
+#         def is_valid(value):
+#             return value and isinstance(value, str) and value.lower() != "unknown"
+        
+#         if all([
+#             is_valid(prediction.get("title")),
+#             is_valid(prediction.get("season")),
+#             is_valid(prediction.get("episode")),
+#             is_valid(prediction.get("language"))
+#         ]):
+#             return prediction
+#         else:
+#             predictions.append(prediction)
+        
+#         # content_type = prediction.get("type", "").lower()
+#         # if is_valid(prediction.get("title")) and is_valid(prediction.get("language")):
+#         #    if content_type == "tv show":
+#         #         if is_valid(prediction.get("season")) and is_valid(prediction.get("episode")):
+#         #             # if prediction.get("confidence", "0").isdigit() and int(prediction["confidence"]) >= 7:
+#         #             return prediction
+                    
+#         predictions.append(prediction)
+#     return predictions[-1] if predictions else {"error": "No confident prediction in any window"}
+# --------------------------
+
 def parse_response(text):
     lines = text.strip().split("\n")
     result = {}

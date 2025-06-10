@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from schemas import TranscriptRequest, TranscriptChunk
-from inference import predict_content, sliding_window_prediction, predict_content_chain, predict_content_chain_new
+from inference import predict_content, sliding_window_prediction, sliding_window_prediction_new, predict_content_chain, predict_content_chain_new
 import os,json
 import csv, io
 from fastapi.responses import StreamingResponse
@@ -96,8 +96,8 @@ async def predictFromUpload(file: UploadFile = File(...)):
         transcript_request = TranscriptRequest(chunks=chunks)
         # prediction = predict_content(transcript_request)
         # prediction = predict_content_chain(transcript_request)
-        prediction = predict_content_chain_new(transcript_request)
-        # prediction = sliding_window_prediction(chunks)
+        # prediction = predict_content_chain_new(transcript_request)
+        prediction = sliding_window_prediction_new(chunks)
         print("Request /predictFromUpload received.")
         return prediction
     except Exception as e:
@@ -120,8 +120,8 @@ async def batchPredict(files: list[UploadFile] = File(...)):
         chunks = parse_txt_to_chunks_from_string(text)
         transcript_request = TranscriptRequest(chunks=chunks)
         # prediction = predict_content_chain(transcript_request)
-        prediction = predict_content_chain_new(transcript_request)
-        # prediction = sliding_window_prediction(chunks)
+        # prediction = predict_content_chain_new(transcript_request)
+        prediction = sliding_window_prediction_new(chunks)
         prediction["filename"] = file.filename
         predictions.append(prediction)
 
