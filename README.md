@@ -158,12 +158,23 @@ The React UI runs on localhost:3000
 ```
 Make sure you have your backend running to test the application from the UI.
 
-## Roadmap to test and explore
-There are two approaches to run the predictions.
+### Roadmap to test and explore
+There are two approaches to run the predictions using React UI:
 
-1. Single Transcript Prediction: Upload a .txt file to run prediction for the entire transcript in one go
+1. Single Transcript Prediction
+    - Upload a .txt file to run prediction for the entire transcript in one go.
+    - Click on Predict Button.
+    - The Model starts 'Predicting...'
+    - You can see the prediction Result on the UI along with the time taken.
 
-2. Sliding Window Evaluation - generates a CSV file with weighted confidence across multiple windows of 1 min to full-length transcript chunks.
+
+2. Sliding Window Evaluation
+    - Generates a CSV file with weighted confidence across multiple windows of 1 min to full-length transcript chunks.
+    - Upload a .txt file
+    - Click on Test Sliding Window button
+    - The prediction runs for sometime, exceutes for all windows
+    - The output is a csv file that you can see in Downloads folder.
+
 
 ## Future Scope
 - Integrate RAT and SQUEAK (Whisper C++ with GenAI model to develop an integrated solution)
