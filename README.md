@@ -160,9 +160,10 @@ Make sure you have your backend running to test the application from the UI.
 
 ## Roadmap to test and explore
 There are two approaches to run the predictions.
-    1. Single Transcript Prediction: Upload a .txt file to run prediction for the entire transcript in one go
 
-    2. Sliding Window Evaluation - generates a CSV file with weighted confidence across multiple windows of 1 min to full-length transcript chunks.
+1. Single Transcript Prediction: Upload a .txt file to run prediction for the entire transcript in one go
+
+2. Sliding Window Evaluation - generates a CSV file with weighted confidence across multiple windows of 1 min to full-length transcript chunks.
 
 ## Future Scope
 - Integrate RAT and SQUEAK (Whisper C++ with GenAI model to develop an integrated solution)
