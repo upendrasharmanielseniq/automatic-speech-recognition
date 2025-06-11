@@ -1,6 +1,8 @@
 
 from openai import AzureOpenAI
 from schemas import TranscriptRequest
+import time, json
+
 from config import (
     AZURE_OPENAI_KEY,
     AZURE_OPENAI_ENDPOINT,
@@ -163,11 +165,9 @@ def predict_content_chain_new(transcript):
     """
     Predict the content of a transcription.
     """
-    
     try:
-
         full_transcript = " ".join([c.transcript for c in transcript.chunks])
-        
+        start_time = time.time()
         prompt = f"Identify the language of the transcript. Transcript:\n\n{full_transcript} \n\n Only give the language as output."
         # prompt = build_prompt_chain(transcript.chunks)
         response = client.chat.completions.create(
@@ -252,8 +252,6 @@ def predict_content_chain_new(transcript):
         print(f"MOVIE SHOW NAME: {movie_show_name}")
 
         if language.upper() != "ENGLISH":
-            # prompt = f"""You are an expert in identifying the Episode Name of the TV shows given the name, summary of the transcript, the transcript and its english translation. Search the internet for the episode name of the TV show {movie_show_name}. Only consider URLs that contain the keyword like {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries, \n\n {movie_show_name} episode where {summary}.
-            # Step-by-step: \n Formulate a search query. \n Filter results to include only URLs with "TV show", "Series", {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries". \n\n If {movie_show_name} is not a TV show return "N/A" else only Episode Name.\n\n Name is {movie_show_name} \n\n Summary is: {summary} \n\n Transcript is: {full_transcript} \n\n Translation is: {translation} Only provide the episode name. Don't provide detailed explanation in the output"""
             prompt = f"""You are an expert in identifying the Episode Name of the TV shows given the name, summary of the transcript, key moments, transcript and its its english translation. Search the internet for the episode name of the TV show {movie_show_name}. Only consider URLs that contain the keyword like {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries, \n\n {movie_show_name} episode where {summary}.
             Step-by-step: \n Formulate a search query. \n Filter results to include only URLs with "TV show", "Series", {movie_show_name} episode list, {movie_show_name} season guide, {movie_show_name} episode summaries". Preferably look up the links in IMDB website. \n\n If {movie_show_name} is not a TV show return "N/A" else only Episode Name.\n\n Name is {movie_show_name} \n\n Summary is: {summary} \n\n Key Moments: {key_moments} \n\n Transcript: {full_transcript} \n\n English Translation of transcript is: {translation} \n\n Only provide the episode name. Don't provide detailed explanation in the output"""
         else:
@@ -314,11 +312,24 @@ def predict_content_chain_new(transcript):
                 max_tokens=500
                 )
         
-        final_output = response.choices[0].message.content.strip()
+        raw_output = response.choices[0].message.content
+
+        if isinstance(raw_output, str):
+            raw_output = raw_output.strip()
+            try:
+                final_output_dict = json.loads(raw_output)
+            except json.JSONDecodeError:
+                final_output_dict = parse_plain_text_response(raw_output)
+        elif isinstance(raw_output, dict):
+            final_output_dict = raw_output
+        else:
+           raise ValueError("Unexpected response format from model.")
+        end_time = time.time()
+        final_output_dict["time_taken"] = f"{end_time - start_time:.2f} seconds"
+
+        print(f"FINAL OUTPUT: \n {final_output_dict}")
         
-        print(f"FINAL OUTPUT: \n {final_output}")
-        
-        return parse_response(final_output)
+        return final_output_dict
     except Exception as e:
         print("OpenAI API call failed:", e)
         return {"error": "Prediction failed", "details": str(e)}
@@ -341,83 +352,52 @@ def sliding_window_prediction(chunks,window_size=2000, step_size=400):
     
     return predictions[0] if predictions else {"error": "No confident prediction in any window"}
     
+def is_valid(value: str) -> bool:
+    """
+    Check if the value is valid (not empty, not 'unknown', etc.).
+    """
+    return bool(value) and value.strip().lower() not in ["", "unknown", "n/a", "none"]
 
-def is_valid(value):
-    return value and isinstance(value, str) and value.lower() != "unknown"
 
-def sliding_window_prediction_new(chunks, max_minutes=5):
-    predictions = []
+def sliding_window_prediction_new(minute_chunks):
+    best_prediction = None
+    highest_score = -1
+    all_predictions = []
 
-    for window_size in range(1, min(len(chunks), max_minutes) + 1):
-        window = chunks[:window_size]
-        transcript_request = TranscriptRequest(chunks=window)
-        prediction = predict_content_chain_new(transcript_request)
+    for minute in range(1, len(minute_chunks) + 1):
+        start_time = time.time()
+        print(f"Processing window: 0 to {minute} minutes")
+        window = [chunk for minute_block in minute_chunks[:minute] for chunk in minute_block]
 
-        print(f"Window 0-{window_size}: {prediction}")
-
-        title = prediction.get("title", "").lower()
-        language = prediction.get("language", "").lower()
-        season = prediction.get("season", "").lower()
-        episode = prediction.get("episode", "").lower()
-        confidence = prediction.get("confidence", "0")
-
-        if not title or title == "unknown" or language == "unknown":
+        try:
+            transcript_request = TranscriptRequest(chunks=window)
+            prediction = predict_content_chain_new(transcript_request)
+        except Exception as e:
+            print(f"Prediction failed at minute {minute}: {e}")
             continue
-        if not confidence.isdigit() or int(confidence) < 7:
-            continue
 
-        if "tv" in title or "season" in season or "episode" in episode:
-            if season == "n/a" or episode == "n/a" or season == "unknown" or episode == "unknown":
-                continue
+        score = 0
+        if is_valid(prediction.get("title")): score += 1
+        if is_valid(prediction.get("language")): score += 1
 
-        return prediction
-    
-    return predictions[-1] if predictions else {"error": "No confident prediction in any window"}
-    #     if is_valid(prediction.get("title")): score += 1
-    #     if is_valid(prediction.get("language")): score += 1
+        content_type = prediction.get("type", "").lower()
+        if content_type == "tv show":
+            if is_valid(prediction.get("season")): score += 1
+            if is_valid(prediction.get("episode")): score += 1
 
-    #     content_type = prediction.get("type", "").lower()
-    #     if content_type == "tv show":
-    #         if is_valid(prediction.get("season")): score += 1
-    #         if is_valid(prediction.get("episode")): score += 1
+        prediction["score"] = score
+        prediction["minutes_used"] = minute
 
-    #     conf = int(prediction.get("confidence", "0")) if prediction.get("confidence", "0").isdigit() else 0
-    #     score += conf
+        end_time = time.time()
+        prediction["prediction_time_seconds"] = f"{end_time - start_time:.2f} seconds"
+        all_predictions.append(prediction)
 
-    #     if score > highest_confidence:
-    #         highest_confidence = score
-    #         best_prediction = prediction
-        
-    #     if content_type == "tv show" and score >= 5 and conf >= 8:
-    #         return prediction
-    #     elif content_type == "movie" and score >= 3 and conf >= 8:
-    #         return prediction
-    #     print(f"Window 0-{window_size}: {prediction}")
-    # return best_prediction if best_prediction else {"error": "No confident prediction in any window"}
-# ---------------------------
-#         def is_valid(value):
-#             return value and isinstance(value, str) and value.lower() != "unknown"
-        
-#         if all([
-#             is_valid(prediction.get("title")),
-#             is_valid(prediction.get("season")),
-#             is_valid(prediction.get("episode")),
-#             is_valid(prediction.get("language"))
-#         ]):
-#             return prediction
-#         else:
-#             predictions.append(prediction)
-        
-#         # content_type = prediction.get("type", "").lower()
-#         # if is_valid(prediction.get("title")) and is_valid(prediction.get("language")):
-#         #    if content_type == "tv show":
-#         #         if is_valid(prediction.get("season")) and is_valid(prediction.get("episode")):
-#         #             # if prediction.get("confidence", "0").isdigit() and int(prediction["confidence"]) >= 7:
-#         #             return prediction
-                    
-#         predictions.append(prediction)
-#     return predictions[-1] if predictions else {"error": "No confident prediction in any window"}
-# --------------------------
+        if score > highest_score:
+            highest_score = score
+            best_prediction = prediction
+
+    print(f"Best prediction after processing all windows: {best_prediction}")
+    return all_predictions
 
 def parse_response(text):
     lines = text.strip().split("\n")
@@ -426,4 +406,12 @@ def parse_response(text):
         if ": " in line:
             key, value = line.split(": ", 1)
             result[key.lower()] = value.strip()
+    return result
+
+def parse_plain_text_response(text):
+    result = {}
+    for line in text.strip().splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            result[key.strip().lower()] = value.strip()
     return result

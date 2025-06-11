@@ -35,6 +35,16 @@ export const uploadBatchTranscripts = async (files) => {
     });
 }
 
+export const predictFromSlidingWindow = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);  
+    return axios.post (`${API_BASE_GENAI}/predict/sliding-window`, formData, {    
+        headers: {
+            "Content-Type": "multipart/form-data"
+        },
+    responseType: "blob"
+    });
+}
 // export const fetchTmdbMetadata = async (title) => {
 //   try {
 //     const response = await axios.get(

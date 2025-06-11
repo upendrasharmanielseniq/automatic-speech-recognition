@@ -4,7 +4,7 @@ import './TranscriptResult.css';
 const TranscriptResult = ({ result }) => {
   if (!result) return null;
 
-  const { title, type, season, episode, language, confidence } = result;
+  const { title, type, season, episode, language, confidence, time_taken } = result;
 
   return (
     <div className="result-card">
@@ -20,6 +20,7 @@ const TranscriptResult = ({ result }) => {
         )}
         <p><strong>Language:</strong> {language}</p>
         <p><strong>Confidence:</strong> {confidence}</p>
+        <p><strong>Time Taken:</strong> {time_taken}</p>
       </div>
     </div>
   );
