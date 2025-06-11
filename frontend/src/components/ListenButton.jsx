@@ -55,24 +55,22 @@ const ListenButton = ({ onTxtFileReceived }) => {
     }
   };
 
-  return (
-    <>
-    <div className="flex flex-col items-center mb-4">
-      <label>
+ return (
+  <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="mb-4 text-center">
+      <label className="block text-lg font-medium mb-2">
         Upload Transcript (.txt)
       </label>
-     
+      <input
+        type="file"
+        accept=".txt"
+        onChange={handleTxtChange}
+        className="block"
+      />
     </div>
-    <div>
-       <input
-          type="file"
-          accept=".txt"
-          onChange={handleTxtChange}
-          className="hidden"
-        />
-    </div>
-    </>
-  );
+  </div>
+);
+
 };
 
 export default ListenButton;

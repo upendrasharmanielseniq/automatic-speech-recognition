@@ -389,7 +389,7 @@ def sliding_window_prediction_new(minute_chunks):
         prediction["minutes_used"] = minute
 
         end_time = time.time()
-        prediction["prediction_time_seconds"] = f"{end_time - start_time:.2f} seconds"
+        prediction["prediction_time_seconds"] = f"{end_time - start_time:.2f}"
         all_predictions.append(prediction)
 
         if score > highest_score:

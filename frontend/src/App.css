@@ -34,3 +34,38 @@ button:disabled {
   align-items: center;
   margin-top: 2rem;
 }
+.card-hover {
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+  border: 1px solid rgba(0, 123, 255, 0.5);
+}
+
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.tagline-glow {
+  font-size: 1.25rem;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+.tagline-gradient {
+  background: linear-gradient(to right, #007bff, #00c6ff);
+  -webkit-text-fill-color: transparent;
+}
+
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #007bff, 0 0 10px #007bff;
+  }
+  to {
+    text-shadow: 0 0 15px #66b2ff, 0 0 25px #66b2ff;
+  }
+}
+

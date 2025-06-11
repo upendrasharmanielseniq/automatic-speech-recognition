@@ -28,19 +28,24 @@ const SlidingWindow = () => {
     }
 };
 
-    return (
-        <div className="my-6 text-center">
-            <span><input type="file" multiple accept=".txt" onChange={handleChange}/></span>
-            <span>
-            <button
-                onClick={handleUpload}
-                className="ml-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-            >
-               Test Sliding Window
-            </button>
-            </span>
-        </div>
-    );
+ return (
+  <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+    <input
+      type="file"
+      multiple
+      accept=".txt"
+      onChange={handleChange}
+      className="text-center"
+    />
+    <button
+      onClick={handleUpload}
+      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+    >
+      Test Sliding Window
+    </button>
+  </div>
+);
+
 };
 
 export default SlidingWindow;
