@@ -1,12 +1,12 @@
-# Speech-to-Text GenAI Classifier
-This project is a production-grade backend for identifying TV Shows, Movies, or Episodes from speech transcript text using Azure OpenAI's GPT-4o-mini model. It is designed to work alongside embedded C++ speech-to-text systems (e.g., Whisper.cpp or Vosk) and provides a clean API for transcript-based content classification.
+# RAT-SQUEAK: Speech-to-Text Audio Listener & GenAI Classifier
+This project is a production-grade backend for identifying TV Shows, Movies, or Episodes from speech transcript text using Azure OpenAI's GPT-4o-mini model. It is designed to work alongside embedded C++ speech-to-text systems (e.g., Whisper.cpp) and provides a clean API for transcript-based content classification.
 
 ---
 
 ## Features
 🔊 Real-time or batch transcript ingestion (JSON or `.txt`)
 🧠 GenAI-powered classification (Azure OpenAI GPT-4o-mini)
-🎬 Returns title, season, episode, language and confidence
+🎬 Returns title, season, episode, language, confidence and time taken
 ⚙️ Designed to work with embedded C++ STT modules
 🧩 Easily extendable with TMDb metadata and frontend UI
 
@@ -15,6 +15,7 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
 ## API Endpoints
 ### `POST /predictFromUpload` 
 ### `POST /batchPredict` 
+### `POST /predictFromWindow` 
 **Request Body:**
 ```txt
 {
@@ -31,37 +32,19 @@ This project is a production-grade backend for identifying TV Shows, Movies, or 
     "title": "Breaking Bad",
     "season": "1",
     "episode": "1",
-    "language": "English"
-    "confidence": "95%"
+    "language": "English",
+    "confidence": "95%",
+    "time_taken": "16.25 seconds"
 }
 ```
 
 ## Setup
+
 ### 1. Clone this Repository
 ```
 git clone https://github.com/upendrasharmanielseniq/automatic-speech-recognition.git
-cd genai-backend
 ```
-### 2. Setup Environment
-```
-python -m venv venv
-venv\Scripts\activate # Windows
-source venv/bin/activate # macOS/Linux
-
-```
-### 3. Install Dependencies
-```
-pip install -r requirements.txt
-```
-
-### 4. Configure Environment Variables
-Create a .env file in the root directory:
-```
-AZURE_OPENAI_KEY=<paste your azure_openai_key here without " ">
-AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
-```
-### 5. Configure RAT
+### 2. Configure RAT
 cd inside automatic-speech-recognition/whisper_cpp folder
 run following commands in the same order
 
@@ -113,8 +96,33 @@ Also some metrics related to audio can be found on the GUI itself.
 6. Click stop to stop RAT from listening your audio.
 7. Click on convert to JSON, if you also want to have a JSON file from your txt output file.
 
+### 3. Configure SQUEAK
 
-## Running the genai-backend
+✅ 1. Go into genai_backend directory
+```
+cd genai_backend
+```
+✅ 2. Setup environment
+```
+python -m venv venv
+venv\Scripts\activate # Windows
+source venv/bin/activate # macOS/Linux
+
+```
+✅ 3. Install dependencies
+```
+pip install -r requirements.txt
+```
+
+✅ 4. Configure Environment Variables
+Create a .env file in the root directory:
+```
+AZURE_OPENAI_KEY=<paste your azure_openai_key here without " ">
+AZURE_OPENAI_ENDPOINT=https://hackfest25-openai-40.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
+```
+
+✅ 5. Running the genai-backend
 ```
 uvicorn main:app --reload
 ```
@@ -125,32 +133,41 @@ $env:PYTHONPATH = "."; uvicorn backend.main:app --reload # Powershell
 PYTHONPATH=. uvicorn backend.main:app --reload # Bash/macOS
 ```
 
-## Running the frontend
-```
+## 4. Configure React UI
 1. Make sure you have node.js installed
 2. Check node version by going into the terminal - Open cmd
-node -v
-npm -v
-cd frontend
-npm install (This installs the dependencies from package.json)
-npm run start
+```
+    node -v
+    npm -v
+    cd frontend
+    npm install (This installs the dependencies from package.json)
+```
+3. If you encounter an error like 'npm.ps1 cannot be loaded because running scripts is 
+disabled on this system' Run:
+```
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+    npm run start
 ```
 
-## Testing
+## 4. Test your application
 
 ```
-The genai-backend runs on localhost:8000
-The frontend UI runs on localhost:3000
+The genai_backend runs on localhost:8000
+The React UI runs on localhost:3000
 
 ```
 Make sure you have your backend running to test the application from the UI.
 
 ## Roadmap to test and explore
-- Uncomment the sliding window function in main.py to test the sliding window approach
+There are two approaches to run the predictions.
+    1. Single Transcript Prediction: Upload a .txt file to run prediction for the entire transcript in one go
 
-## TBD
+    2. Sliding Window Evaluation - generates a CSV file with weighted confidence across multiple windows of 1 min to full-length transcript chunks.
+
+## Future Scope
 - Integrate RAT and SQUEAK (Whisper C++ with GenAI model to develop an integrated solution)
 - Deploy via Docker / Azure App Service
+- Implement genre detection from transcript prediction
 
 ## License
 MIT License
