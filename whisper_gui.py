@@ -1,64 +1,51 @@
-import subprocess
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-import os
-import platform
-import datetime
+import subprocess
 import threading
+import os
+import datetime
 import re
 import json
 
 whisper_process = None
 final_output_path = ""
 
-def run_whisper():
+ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
+timestamp_pattern = re.compile(r'\[\d{2}:\d{2}:\d{2}\.\d{3} *--> *\d{2}:\d{2}:\d{2}\.\d{3}\]')
+
+def list_models():
+    model_folder = os.path.join("whisper_cpp", "models")
+    return [f for f in os.listdir(model_folder) if f.endswith(".bin")] if os.path.exists(model_folder) else []
+
+def run_whisper_stream():
     global whisper_process, final_output_path
 
-    audio_file = audio_entry.get().strip()
-    model_file = model_entry.get().strip()
+    model_file = model_var.get()
     output_file = output_entry.get().strip()
-    threads = threads_entry.get().strip()
+    threads = threads_entry.get().strip() or "4"
 
-    if not all([audio_file, model_file, threads]):
-        messagebox.showerror("Missing Input", "Please fill in all required fields.")
+    if not model_file:
+        messagebox.showerror("Missing Input", "Please select a model.")
         return
 
-    is_windows = platform.system() == "Windows"
-    cli_executable = "whisper-cli.exe" if is_windows else "./whisper-cli"
-    cli_path = os.path.join("whisper_cpp", cli_executable)
-
-    model_path = os.path.join("whisper_cpp", "models", model_file)
-    audio_path = os.path.join("whisper_cpp", "samples", audio_file)
-
-    if not output_file:
+    output_dir, output_filename = os.path.split(output_file)
+    if not output_filename:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = os.path.join("whisper_cpp", "output", f"transcript_{timestamp}.txt")
-    else:
-        if not os.path.isabs(output_file):
-            output_file = os.path.join("whisper_cpp", "output", output_file)
+        output_filename = f"transcript_{timestamp}.txt"
+    if not output_dir:
+        output_dir = os.path.join("whisper_cpp", "output")
 
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    final_output_path = output_file
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, output_filename)
+    final_output_path = output_path
+
+    cli_path = os.path.join("whisper_cpp", "build", "bin", "whisper-stream")
+    model_path = os.path.join("whisper_cpp", "models", model_file)
 
     cmd = [
         cli_path,
         "-m", model_path,
-        "-f", audio_path,
         "-l", "auto",
-        "-t", threads
-    ]
-
-    def read_output():
-        nonlocal output_file
-        try:
-            with open(output_file, "w", encoding="utf-8") as out_f:
-                whisper_process = subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True, encoding='utf-8', errors='replace', bufsize=1
-                )
-                run_button.config(state=tk.DISABLED)
-                stop_button.config(state=tk.NORMAL)
-                convert_button.config(state=tk.DISABLED)
         "-t", threads,
         "--step", "0",
         "--length", "5000",
@@ -88,39 +75,56 @@ def read_output(cmd, output_path):
             output_text.delete(1.0, tk.END)
         root.after(0, on_start)
 
-                for line in whisper_process.stdout:
-                    lang_conf_match = re.search(r"auto-detected language:\s*([a-z]{2})\s*\(p\s*=\s*([0-9.]+)\)", line)
-                    if lang_conf_match:
-                        language_var.set(lang_conf_match.group(1))
-                        confidence_var.set(lang_conf_match.group(2))
+        with open(output_path, "w", encoding="utf-8") as out_f:
+            for line in whisper_process.stdout:
+                clean_line = ansi_escape.sub("", line).strip()
 
-                    if re.match(r"\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]", line):
-                        output_text.insert(tk.END, line)
-                        output_text.see(tk.END)
-                        out_f.write(line)
+                # Display in GUI
+                def append():
+                    output_text.insert(tk.END, clean_line + "\n")
+                    output_text.see(tk.END)
+                root.after(0, append)
 
-                whisper_process.wait()
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to run whisper: {e}")
-        finally:
-            run_button.config(state=tk.NORMAL)
+                # Write only unique timestamped lines
+                if timestamp_pattern.search(clean_line) and clean_line not in seen_lines:
+                    # Extract only the internal timestamp and text
+                    match = re.search(r"\[(\d{2}:\d{2}:\d{2}\.\d{3} *--> *\d{2}:\d{2}:\d{2}\.\d{3})\]\s+(.*)", clean_line)
+                    if match:
+                        ts, dialogue = match.groups()
+                        formatted_line = f"[{ts}]   {dialogue.strip()}"
+                        if formatted_line not in seen_lines:
+                            out_f.write(formatted_line + "\n")
+                            seen_lines.add(formatted_line)
+
+
+                # Language and confidence
+                match = re.search(r"auto-detected language:\s*([a-z]{2})\s*\(p\s*=\s*([0-9.]+)\)", clean_line)
+                if match:
+                    lang, conf = match.groups()
+                    root.after(0, lambda: language_var.set(lang))
+                    root.after(0, lambda: confidence_var.set(conf))
+
+    except Exception as e:
+        root.after(0, lambda: messagebox.showerror("Error", str(e)))
+    finally:
+        def on_finish():
+            listen_button.config(state=tk.NORMAL)
             stop_button.config(state=tk.DISABLED)
-            convert_button.config(state=tk.NORMAL)  # Enable JSON button
-
-    threading.Thread(target=read_output, daemon=True).start()
+            convert_button.config(state=tk.NORMAL)
+        root.after(0, on_finish)
 
 def stop_whisper():
     global whisper_process
     if whisper_process:
         whisper_process.terminate()
-        run_button.config(state=tk.NORMAL)
+        whisper_process = None
         stop_button.config(state=tk.DISABLED)
+        listen_button.config(state=tk.NORMAL)
 
 def convert_to_json():
     global final_output_path
-
     if not os.path.exists(final_output_path):
-        messagebox.showerror("Error", "Transcription output file not found.")
+        messagebox.showerror("Error", "Transcript file not found.")
         return
 
     json_output_path = final_output_path.replace(".txt", ".json")
@@ -129,25 +133,20 @@ def convert_to_json():
     try:
         with open(final_output_path, "r", encoding="utf-8") as f:
             for line in f:
-                match = re.match(r"\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\](.*)", line)
+                match = re.match(r"\[(\d{2}:\d{2}:\d{2}\.\d{3}) *--> *(\d{2}:\d{2}:\d{2}\.\d{3})\](.*)", line)
                 if match:
                     start, end, text = match.groups()
-                    json_data.append({
-                        "start": start.strip(),
-                        "end": end.strip(),
-                        "text": text.strip()
-                    })
+                    json_data.append({"start": start.strip(), "end": end.strip(), "text": text.strip()})
 
         with open(json_output_path, "w", encoding="utf-8") as jf:
             json.dump(json_data, jf, ensure_ascii=False, indent=2)
 
-        messagebox.showinfo("Success", f"Transcript converted to JSON:\n{json_output_path}")
+        messagebox.showinfo("Success", f"Saved JSON:\n{json_output_path}")
     except Exception as e:
-        messagebox.showerror("Error", f"Failed to convert to JSON: {e}")
+        messagebox.showerror("Error", str(e))
 
-# GUI Setup
+# === GUI ===
 root = tk.Tk()
-root.title("Whisper.cpp Transcription GUI")
 root.title("RAT(Realtime Audio Transcriptor)")
 
 # Set window size (optional)
@@ -164,39 +163,49 @@ image_label.place(relx=1.0, rely=0.0, anchor='ne')  # Top-right corner
 frame = tk.Frame(root, padx=10, pady=10)
 frame.pack()
 
-fields = [
-    ("Audio File (inside samples_folder/):", "audio_entry"),
-    ("Model File (inside models/):", "model_entry"),
-    ("Output File Name (.txt, optional):", "output_entry"),
-    ("Number of Threads:", "threads_entry")
-]
+tk.Label(frame, text="Select Model:").pack(anchor="w")
+model_var = tk.StringVar()
+models = list_models()
 
-for label_text, var_name in fields:
-    tk.Label(frame, text=label_text).pack(anchor="w")
-    entry = tk.Entry(frame, width=50)
-    entry.pack(anchor="w", pady=2)
-    globals()[var_name] = entry
+# Use a fallback if the list is empty
+if models:
+    default_model = models[0]
+else:
+    default_model = "No models found"
+    models = [default_model]
 
-language_var = tk.StringVar()
+model_var.set(default_model)
+model_dropdown = tk.OptionMenu(frame, model_var, *models)
+model_dropdown.pack(anchor="w", fill="x")
+
+
+tk.Label(frame, text="Output Filename (optional, can include folder):").pack(anchor="w")
+output_entry = tk.Entry(frame, width=50)
+output_entry.pack(anchor="w", pady=2)
+
+tk.Label(frame, text="Number of Threads:").pack(anchor="w")
+threads_entry = tk.Entry(frame, width=10)
+threads_entry.insert(0, "4")
+threads_entry.pack(anchor="w", pady=2)
+
 tk.Label(frame, text="Language Detected:").pack(anchor="w")
-language_label = tk.Label(frame, textvariable=language_var, fg="blue")
-language_label.pack(anchor="w")
+language_var = tk.StringVar()
+tk.Label(frame, textvariable=language_var, fg="blue").pack(anchor="w")
 
-confidence_var = tk.StringVar()
 tk.Label(frame, text="Confidence:").pack(anchor="w")
-confidence_label = tk.Label(frame, textvariable=confidence_var, fg="green")
-confidence_label.pack(anchor="w")
+confidence_var = tk.StringVar()
+tk.Label(frame, textvariable=confidence_var, fg="green").pack(anchor="w")
 
-run_button = tk.Button(frame, text="Run Transcription", command=run_whisper)
-run_button.pack(pady=(10, 0))
+listen_button = tk.Button(frame, text="🎧 Listen", command=run_whisper_stream)
+listen_button.pack(pady=5)
 
-stop_button = tk.Button(frame, text="Stop", state=tk.DISABLED, command=stop_whisper)
-stop_button.pack(pady=(5, 0))
+stop_button = tk.Button(frame, text="🛑 Stop", state=tk.DISABLED, command=stop_whisper)
+stop_button.pack(pady=5)
 
 convert_button = tk.Button(frame, text="Convert to JSON", state=tk.DISABLED, command=convert_to_json)
-convert_button.pack(pady=(5, 10))
+convert_button.pack(pady=10)
 
 output_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=100, height=30, font=("Courier", 10))
-output_text.pack(padx=10, pady=(0, 10))
+output_text.pack(padx=10, pady=10)
 
 root.mainloop()
