@@ -149,7 +149,7 @@ disabled on this system' Run:
     npm run start
 ```
 
-## 4. Test your application
+## 5. Test your application
 
 ```
 The genai_backend runs on localhost:8000
